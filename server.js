@@ -46,7 +46,7 @@ const start = async () => {
          useNewUrlParser: true,
       });
 
-      const port = process.env.port||5000; 
+      const port = process.env.PORT || 5000; 
       const urlHost = process.env.APP_URL; 
 
       app.listen(port,() => (console.log(`server is listening at ${urlHost}`)));
