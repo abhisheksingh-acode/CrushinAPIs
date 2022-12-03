@@ -9,7 +9,6 @@ Dotenv.config();
 
 // import custom error methods
 import { IfExist, IfRequired } from "../errors/registerError.js";
-import { response } from "express";
 
 function isEmptyObject(obj) {
   return JSON.stringify(obj) === "{}";
