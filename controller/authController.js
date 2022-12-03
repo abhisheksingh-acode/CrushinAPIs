@@ -32,9 +32,9 @@ const register = async (req, res) => {
       );
     }
 
-    let profile = JSON.stringify(
-      req.files["profile"][0] ? req.files["profile"][0].filename : ""
-    );
+    let profile = req.files["profile"][0]
+      ? req.files["profile"][0].filename
+      : "";
     let photos = req.files["photos"] ? req.files["photos"] : [];
 
     if (photos != null && photos.length >= 0) {
@@ -91,22 +91,20 @@ const login = async (req, res) => {
     .json({ message: "invalid credentials try with correct one." });
 };
 
-
 const logout = async (req, res) => {
-     const authHeader = req.headers['authorization'];
+  const authHeader = req.headers["authorization"];
 
-     if(authHeader){
-        jwt.sign(authHeader,"",{expiresIn: 1},(logout, err) => {
-          if (logout) {
-            res.status(StatusCodes.OK).json({message:"session logged out."});
-            } else {
-            throw new Error('Something went wrong !!')
-            }
-            throw new Error(err)
-
-        });
-     }
-}
+  if (authHeader) {
+    jwt.sign(authHeader, "", { expiresIn: 1 }, (logout, err) => {
+      if (logout) {
+        res.status(StatusCodes.OK).json({ message: "session logged out." });
+      } else {
+        throw new Error("Something went wrong !!");
+      }
+      throw new Error(err);
+    });
+  }
+};
 
 const reset = (req, res) => {
   res.send("reset");
