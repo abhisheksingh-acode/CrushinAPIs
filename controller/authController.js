@@ -99,12 +99,12 @@ const loginRequest = async (req, res) => {
   const user = await User.findOne({ phone });
 
   if (user) {
-    const otp = Math.floor(Math.random() * 10000);
+    const otp = Math.floor(1000 + Math.random() * 9000);
     await user.updateOne({ phoneotp: otp });
     res.status(StatusCodes.OK).json({ otp });
     return;
   } else {
-    const otp = Math.floor(Math.random() * 10000);
+    const otp = Math.floor(1000 + Math.random() * 9000);
     await Otp.create({ phone, otp });
 
     res.status(StatusCodes.OK).json({ otp });
