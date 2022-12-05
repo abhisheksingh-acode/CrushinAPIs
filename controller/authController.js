@@ -136,6 +136,7 @@ const loginVerify = async (req, res) => {
     const find = await Otp.findOne({ phone, otp });
 
     if (find) {
+      await find.deleteOne();
       res.status(StatusCodes.OK).json({ message: 'verified' });
       return;
     } else {
