@@ -99,7 +99,11 @@ const loginRequest = async (req, res) => {
   const user = await User.findOne({ phone });
 
   if (!user) {
-    throw new IfRequired("invalid phone number");
+    create = await User.create({
+      phone
+    });
+
+    user = await User.findOne({ phone });
   }
 
   const otp = Math.floor(Math.random() * 10000);
@@ -129,7 +133,7 @@ const loginVerify = async (req, res) => {
   }
   res
     .status(StatusCodes.BAD_REQUEST)
-    .json({ error: true,message: "invalid otp try again." });
+    .json({ error: true, message: "invalid otp try again." });
 };
 
 const logout = async (req, res) => {
