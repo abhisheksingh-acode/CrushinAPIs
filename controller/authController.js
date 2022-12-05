@@ -133,11 +133,10 @@ const loginVerify = async (req, res) => {
       .json({ error: true, message: "invalid otp try again." });
     return;
   } else {
-    const find = await Otp.findOne({ phone });
-    const checkOtp = otp == find.otp ? true : false;
-    if (user && checkPassword) {
-      const token = user.createJWT();
-      res.status(StatusCodes.OK).json({ otp });
+    const find = await Otp.findOne({ phone, otp });
+
+    if (find) {
+      res.status(StatusCodes.OK).json({ message: 'verified' });
       return;
     } else {
       res
