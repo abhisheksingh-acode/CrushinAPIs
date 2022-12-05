@@ -1,5 +1,6 @@
 import User from "../models/User.js";
 import Referral from "../models/Referral.js";
+import Otp from "../models/Otp.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { StatusCodes } from "http-status-codes";
@@ -95,21 +96,19 @@ const loginRequest = async (req, res) => {
     throw new IfRequired("please provide all required inputs");
   }
   const { phone } = req.body;
-
   const user = await User.findOne({ phone });
 
-  if (!user) {
-    create = await User.create({
-      phone
-    });
+  if (user) {
+    const otp = Math.floor(Math.random() * 10000);
+    await user.updateOne({ phoneotp: otp });
+    res.status(StatusCodes.OK).json({ otp });
+    return;
+  } else {
+    const otp = Math.floor(Math.random() * 10000);
+    await Otp.create({ phone, otp });
 
-    user = await User.findOne({ phone });
+    res.status(StatusCodes.OK).json({ otp });
   }
-
-  const otp = Math.floor(Math.random() * 10000);
-  await user.updateOne({ phoneotp: otp });
-
-  res.status(StatusCodes.OK).json({ otp });
 };
 
 const loginVerify = async (req, res) => {
@@ -121,19 +120,27 @@ const loginVerify = async (req, res) => {
   // find user by email
   const user = await User.findOne({ phone });
 
-  if (!user) {
-    throw new IfRequired("invalid credentials try with correct one.");
-  }
+  if (user) {
+    const checkPassword = otp == user.phoneotp ? true : false;
+    if (user && checkPassword) {
+      const token = user.createJWT();
+      res.status(StatusCodes.OK).json({ token, user });
 
-  const checkPassword = otp == user.phoneotp ? true : false;
-
-  if (user && checkPassword) {
-    const token = user.createJWT();
-    res.status(StatusCodes.OK).json({ token, user });
+      return;
+    }
+    res
+      .status(StatusCodes.BAD_REQUEST)
+      .json({ error: true, message: "invalid otp try again." });
+    return;
+  } else {
+    const find = await Otp.findOne({ phone });
+    const checkOtp = otp == find.otp ? true : false;
+    if (user && checkPassword) {
+      const token = user.createJWT();
+      res.status(StatusCodes.OK).json({ otp });
+      return;
+    }
   }
-  res
-    .status(StatusCodes.BAD_REQUEST)
-    .json({ error: true, message: "invalid otp try again." });
 };
 
 const logout = async (req, res) => {
