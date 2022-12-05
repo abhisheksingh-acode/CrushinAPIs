@@ -129,7 +129,7 @@ const loginVerify = async (req, res) => {
   }
   res
     .status(StatusCodes.BAD_REQUEST)
-    .json({ message: "invalid otp try again." });
+    .json({ error: true,message: "invalid otp try again." });
 };
 
 const logout = async (req, res) => {
