@@ -19,7 +19,7 @@ const UserSchema = new mongoose.Schema({
       message: "provide a valid email address",
     },
     unique: [true, "email is already in use."],
-    required: [true, "Email address is required"],
+    required: [false, "Email address is required"],
   },
   name: {
     type: String,
@@ -95,6 +95,10 @@ const UserSchema = new mongoose.Schema({
     type: String,
     minlength: 3,
     maxlength: 20,
+  },
+  privacy: {
+    type: Boolean,
+    default:false
   },
   phoneotp: {
     type: String,
