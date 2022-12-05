@@ -41,7 +41,7 @@ const register = async (req, res) => {
     if (isEmptyObject(req.body)) {
       throw new IfRequired("please provide all required inputs");
     }
-    const UserExist = await User.findOne(req.body);
+    const UserExist = await User.findOne({phone: req.body.phone});
 
     if (UserExist) {
       throw new IfExist(
@@ -137,7 +137,7 @@ const loginVerify = async (req, res) => {
 
     if (find) {
       await find.deleteOne();
-      res.status(StatusCodes.OK).json({ message: 'verified' });
+      res.status(StatusCodes.OK).json({ message: "verified" });
       return;
     } else {
       res
