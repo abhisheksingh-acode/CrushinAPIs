@@ -96,12 +96,15 @@ const UserSchema = new mongoose.Schema({
     minlength: 3,
     maxlength: 20,
   },
+  phoneotp: {
+    type: String,
+    default: "",
+  },
 });
 
 UserSchema.pre("save", async function () {
   const saltRounds = 10;
   this.password = await bcrypt.hash(this.password,saltRounds);
-  
 });
 
 UserSchema.methods.createJWT = function () {

@@ -1,8 +1,15 @@
 import User from "../models/User.js";
+import Referral from "../models/Referral.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { StatusCodes } from "http-status-codes";
 import Dotenv from "dotenv";
+import mongoose from "mongoose";
+
+import { STATUS } from "../models/Referral.js";
+
+import availableGems from "../helpers/gems.js";
+import availableSuperLikes from "../helpers/superLikes.js";
 
 // allow env
 Dotenv.config();
@@ -16,7 +23,16 @@ function isEmptyObject(obj) {
 
 const users = async (req, res) => {
   const users = await User.find();
-  res.status(StatusCodes.OK).send(users);
+  res.status(StatusCodes.OK).json(users);
+};
+
+const account = async (req, res) => {
+  const user_id = req.params.user_id;
+  const user = await User.findOne({ _id: user_id });
+  const gems = await availableGems(user_id);
+  const superlikes = await availableSuperLikes(user_id);
+
+  res.status(StatusCodes.OK).json({ user, gems, superlikes });
 };
 
 const register = async (req, res) => {
@@ -49,6 +65,13 @@ const register = async (req, res) => {
     createFormData = { ...createFormData, profile, photos };
 
     let user = await User.create(createFormData);
+
+    const checkRef = await Referral.findOne({ phone: req.body.phone });
+
+    if (checkRef) {
+      await checkRef.updateOne({ status: true, label: STATUS.SUCCESS });
+    }
+
     let token = user.createJWT();
     res.status(StatusCodes.CREATED).json({ user, token });
   } catch (error) {
@@ -67,52 +90,94 @@ const destroy = async (req, res) => {
   }
 };
 
-const login = async (req, res) => {
+const loginRequest = async (req, res) => {
   if (isEmptyObject(req.body)) {
     throw new IfRequired("please provide all required inputs");
   }
-  const { email, password } = req.body;
+  const { phone } = req.body;
+
+  const user = await User.findOne({ phone });
+
+  if (!user) {
+    throw new IfRequired("invalid phone number");
+  }
+
+  const otp = Math.floor(Math.random() * 10000);
+  await user.updateOne({ phoneotp: otp });
+
+  res.status(StatusCodes.OK).json({ otp });
+};
+
+const loginVerify = async (req, res) => {
+  if (isEmptyObject(req.body)) {
+    throw new IfRequired("please provide all required inputs");
+  }
+  const { otp, phone } = req.body;
 
   // find user by email
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ phone });
 
   if (!user) {
     throw new IfRequired("invalid credentials try with correct one.");
   }
 
-  const checkPassword = await bcrypt.compare(password, user.password);
+  const checkPassword = otp == user.phoneotp ? true : false;
 
   if (user && checkPassword) {
     const token = user.createJWT();
-    res.status(StatusCodes.OK).json({ token, user, email });
+    res.status(StatusCodes.OK).json({ token, user });
   }
   res
     .status(StatusCodes.BAD_REQUEST)
-    .json({ message: "invalid credentials try with correct one." });
+    .json({ message: "invalid otp try again." });
 };
 
-
 const logout = async (req, res) => {
-     const authHeader = req.headers['authorization'];
+  const authHeader = req.headers["authorization"];
 
-     if(authHeader){
-        jwt.sign(authHeader,"",{expiresIn: 1},(logout, err) => {
-          if (logout) {
-            res.status(StatusCodes.OK).json({message:"session logged out."});
-            } else {
-            throw new Error('Something went wrong !!')
-            }
-            throw new Error(err)
-
-        });
-     }
-}
+  if (authHeader) {
+    jwt.sign(authHeader, "", { expiresIn: 1 }, (logout, err) => {
+      if (logout) {
+        res.status(StatusCodes.OK).json({ message: "session logged out." });
+      } else {
+        throw new Error("Something went wrong !!");
+      }
+      throw new Error(err);
+    });
+  }
+};
 
 const reset = (req, res) => {
   res.send("reset");
 };
-const update = (req, res) => {
-  res.send("update");
+const update = async (req, res) => {
+  if (!req.params.userid) {
+    throw new IfRequired("please provide all required inputs");
+  }
+
+  const find = await User.findOne({
+    _id: mongoose.Types.ObjectId(req.params.userid),
+  });
+
+  if (find) {
+    await find.updateOne(req.body);
+  }
+
+  const user = await User.findOne({
+    _id: mongoose.Types.ObjectId(req.params.userid),
+  });
+
+  res.status(200).json({ message: "updated successfully", user });
 };
 
-export { register, login, logout, reset, destroy, update, users };
+export {
+  register,
+  loginRequest,
+  loginVerify,
+  logout,
+  reset,
+  destroy,
+  update,
+  users,
+  account,
+};

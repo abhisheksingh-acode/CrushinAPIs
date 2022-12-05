@@ -3,22 +3,22 @@ import multer from "multer";
 import path from "path";
 const router = express.Router();
 
-
 import {
   register,
-  login,
+  loginRequest,
+  loginVerify,
   reset,
   update,
   users,
+  account,
   destroy,
-  logout
+  logout,
 } from "../controller/authController.js";
 
 // middlwares auth token
-import UserTokenAuth from '../middleware/tokenAuthenticate.js'
+import UserTokenAuth from "../middleware/tokenAuthenticate.js";
 
-
-// @media uploader helper function 
+// @media uploader helper function
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "./media");
@@ -34,6 +34,8 @@ const uploader = multer({ storage: storage });
 
 router.get("/users", users);
 
+router.post("/account/:user_id", UserTokenAuth, account);
+
 router.post(
   "/register",
   uploader.fields([
@@ -43,12 +45,13 @@ router.post(
   register
 );
 
-router.post("/login", login);
+router.post("/login/request", loginRequest);
+router.post("/login/verify", loginVerify);
 
 // @auth routes
 router.post("/logout", UserTokenAuth, logout);
-router.delete("/delete/:find",UserTokenAuth, destroy);
-router.put("/update/:id",UserTokenAuth, update);
+router.delete("/delete/:find", UserTokenAuth, destroy);
+router.put("/update/:userid", UserTokenAuth, update);
 
 router.post("/reset", reset);
 
