@@ -139,6 +139,10 @@ const loginVerify = async (req, res) => {
       const token = user.createJWT();
       res.status(StatusCodes.OK).json({ otp });
       return;
+    } else {
+      res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ error: true, message: "invalid otp try again." });
     }
   }
 };
