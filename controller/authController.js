@@ -103,7 +103,7 @@ const loginRequest = async (req, res) => {
 
   if (user) {
     const otp = Math.floor(1000 + Math.random() * 9000);
-    await user.updateOne({ phoneotp: otp });
+    await user.updateOne({ phoneotp: '0000' });
     res.status(StatusCodes.OK).json({ otp });
     return;
   } else {
