@@ -38,13 +38,12 @@ const account = async (req, res) => {
 
 const register = async (req, res) => {
   try {
-
     // res.status(StatusCodes.OK).json(req.body);
     // return ;
     if (isEmptyObject(req.body)) {
       throw new IfRequired("please provide all required inputs");
     }
-    const UserExist = await User.findOne({phone: req.body.phone});
+    const UserExist = await User.findOne({ phone: req.body.phone });
 
     if (UserExist) {
       throw new IfExist(
@@ -103,12 +102,12 @@ const loginRequest = async (req, res) => {
 
   if (user) {
     const otp = Math.floor(1000 + Math.random() * 9000);
-    await user.updateOne({ phoneotp: '0000' });
+    await user.updateOne({ phoneotp: "0000" });
     res.status(StatusCodes.OK).json({ otp });
     return;
   } else {
     const otp = Math.floor(1000 + Math.random() * 9000);
-    await Otp.create({ phone, otp });
+    await Otp.create({ phone, otp: "0000" });
 
     res.status(StatusCodes.OK).json({ otp });
   }
