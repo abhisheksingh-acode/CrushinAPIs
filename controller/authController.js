@@ -39,8 +39,8 @@ const account = async (req, res) => {
 const register = async (req, res) => {
   try {
 
-    res.status(StatusCodes.OK).json(req.body);
-    return ;
+    // res.status(StatusCodes.OK).json(req.body);
+    // return ;
     if (isEmptyObject(req.body)) {
       throw new IfRequired("please provide all required inputs");
     }
