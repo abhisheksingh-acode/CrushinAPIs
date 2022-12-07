@@ -168,7 +168,7 @@ const filter = async (req, res) => {
 const notifications = async (req, res) => {
   const user_id = req.params.user_id;
   const result = await Notification.find()
-    .where("user_id")
+    .where("profile_id")
     .equals(user_id)
     .where("read")
     .equals(false)
