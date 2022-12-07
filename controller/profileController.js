@@ -1,10 +1,9 @@
 import User from "../models/User.js";
 import Like from "../models/Like.js";
 import SuperLike from "../models/SuperLike.js";
-import Notification from "../models/Notification.js";
+import Notification, {SUBJECT, NOTIFICATION, TYPE } from "../models/Notification.js";
 import { StatusCodes } from "http-status-codes";
 
-import { SUBJECT, NOTIFICATION } from "../models/Notification.js";
 
 /* helper function */
 import { create, read } from "../helpers/createNotification.js";
@@ -38,7 +37,7 @@ const profilesView = async (req, res) => {
 
 /* like */
 const profileLike = async (req, res) => {
-  const profile = req.params.id;
+  const profile = req.params.profile_id;
   req.body.profile_id = profile;
   const { user_id, label, status, accept, profile_id } = req.body;
   const checkRecord = await Like.findOne({ user_id, profile_id });
@@ -49,7 +48,7 @@ const profileLike = async (req, res) => {
   }
   const data = await Like.create(req.body);
 
-  const notify = create(user_id, SUBJECT.LIKED, NOTIFICATION.LIKED);
+  const notify = create(user_id, profile_id, TYPE.LIKED, SUBJECT.LIKED, NOTIFICATION.LIKED);
 
   res.status(StatusCodes.OK).json(data);
 };
@@ -57,9 +56,18 @@ const profileLike = async (req, res) => {
 /* like request handle */
 const profileLikeHandle = async (req, res) => {
   const likeId = req.params.id;
-  // const { status, accept } = req.body;
   const like = await Like.findOne({ _id: likeId });
-  await like.updateOne(req.body);
+  const result = await like.updateOne(req.body);
+
+  if (result && req.body.accept) {
+    const notify = create(
+      like.profile_id,
+      like.user_id,
+      TYPE.SUPERLIKED,
+      SUBJECT.MATCHED,
+      NOTIFICATION.MATCHED
+    );
+  }
   res.status(StatusCodes.OK).json({ message: "operation succeed" });
 };
 
@@ -80,8 +88,8 @@ const profileSuperLikeAvailable = async (req, res) => {
 };
 
 const profileSuperLike = async (req, res) => {
+  const profile_id = req.params.profile_id;
   const user_id = req.params.user_id;
-  const profile_id = req.params.id;
 
   const available = await SuperLike.findOne()
     .where("user_id")
@@ -113,6 +121,16 @@ const profileSuperLike = async (req, res) => {
     isSuper: true,
     available: check,
   });
+
+  if (data) {
+    const notify = create(
+      user_id,
+      profile_id,
+      TYPE.SUPERLIKED,
+      SUBJECT.SUPERLIKED,
+      NOTIFICATION.SUPERLIKED
+    );
+  }
 
   res.status(StatusCodes.OK).json(data);
 };
@@ -152,12 +170,20 @@ const notifications = async (req, res) => {
   const result = await Notification.find()
     .where("user_id")
     .equals(user_id)
-    .sort("-_id")
     .where("read")
     .equals(false)
+    .sort("-_id")
     .exec();
 
   res.status(StatusCodes.OK).json(result);
+};
+
+const notificationRead = async (req, res) => {
+  const id = req.params.id;
+  const result = await Notification.findOne({_id:id})
+  await result.updateOne({read:true});
+
+  res.status(StatusCodes.OK).json({message:'marked as read'});
 };
 
 export {
@@ -168,5 +194,7 @@ export {
   profileSuperLike,
   profileSuperLikeAvailable,
   profileDislike,
+  notifications,
+  notificationRead,
   filter,
 };

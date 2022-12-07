@@ -28,7 +28,6 @@ const LikeSchema = new mongoose.Schema({
   },
   action: {
     type: String,
-    required: [true, "like action is required"],
   },
   // like or dislike
   status: {

@@ -16,9 +16,11 @@ const getUnread = async (user_id) => {
   return result;
 };
 
-const create = async (user_id, subject, message) => {
+const create = async (user_id, profile_id, type, subject, message) => {
   const result = await Notification.create({
     user_id,
+    profile_id,
+    type,
     subject,
     notification: message,
   });
