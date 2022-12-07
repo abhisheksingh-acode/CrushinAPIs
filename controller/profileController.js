@@ -63,7 +63,7 @@ const profileLikeHandle = async (req, res) => {
     const notify = create(
       like.profile_id,
       like.user_id,
-      TYPE.SUPERLIKED,
+      TYPE.MATCHED,
       SUBJECT.MATCHED,
       NOTIFICATION.MATCHED
     );
