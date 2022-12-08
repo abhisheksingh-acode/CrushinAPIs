@@ -34,7 +34,7 @@ const account = async (req, res) => {
   const gems = await availableGems(user_id);
   const superlikes = await availableSuperLikes(user_id);
 
-  res.status(StatusCodes.OK).json({ user, gems, superlikes });
+  res.status(StatusCodes.OK).json({ user: userData, gems, superlikes });
 };
 
 const register = async (req, res) => {
@@ -125,6 +125,7 @@ const loginVerify = async (req, res) => {
 
   if (user) {
     const checkPassword = otp == user.phoneotp ? true : false;
+
     if (user && checkPassword) {
       const token = user.createJWT();
       res.status(StatusCodes.OK).json({ token, user });
@@ -165,10 +166,9 @@ const logout = async (req, res) => {
   }
 };
 
-const reset = (req, res) => {
-
-  // const file = fs
-  res.send("reset");
+const reset = async (req, res) => {
+  const users = await User.find();
+  res.json(users);
 };
 const update = async (req, res) => {
   if (!req.params.userid) {
