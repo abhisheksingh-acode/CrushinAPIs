@@ -22,6 +22,10 @@ import mongoose from "mongoose";
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static('public')); 
+
+
+app.use('/media', express.static('media'));
 
 app.get("/", (req, res) => {
   res.json({ msg: "welcome" });

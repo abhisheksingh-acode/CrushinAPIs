@@ -6,6 +6,7 @@ import jwt from "jsonwebtoken";
 import { StatusCodes } from "http-status-codes";
 import Dotenv from "dotenv";
 import mongoose from "mongoose";
+import fs from "fs";
 
 import { STATUS } from "../models/Referral.js";
 
@@ -52,7 +53,7 @@ const register = async (req, res) => {
     }
 
     let profile = JSON.stringify(
-      req.files["profile"][0] ? req.files["profile"][0].filename : ""
+      req.files["profile"][0] ? req.files["profile"][0].path : ""
     );
     let photos = req.files["photos"] ? req.files["photos"] : [];
 
@@ -165,6 +166,8 @@ const logout = async (req, res) => {
 };
 
 const reset = (req, res) => {
+
+  // const file = fs
   res.send("reset");
 };
 const update = async (req, res) => {
