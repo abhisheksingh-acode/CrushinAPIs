@@ -61,11 +61,11 @@ const UserSchema = new mongoose.Schema({
     required: [true, "relation find is required"],
   },
   habit_drink: {
-    type: Boolean,
+    type: String,
     required: [true, "drink selection is required"],
   },
   habit_smoke: {
-    type: Boolean,
+    type: String,
     required: [true, "smoking selection is required"],
   },
   religion: {
