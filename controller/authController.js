@@ -34,7 +34,7 @@ const account = async (req, res) => {
   const gems = await availableGems(user_id);
   const superlikes = await availableSuperLikes(user_id);
 
-  res.status(StatusCodes.OK).json({ user: userData, gems, superlikes });
+  res.status(StatusCodes.OK).json({ user, gems, superlikes });
 };
 
 const register = async (req, res) => {
