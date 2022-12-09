@@ -18,6 +18,7 @@ import profileRouter from "./routes/profiles/index.js";
 import likeRouter from "./routes/likes/index.js";
 import referralRouter from "./routes/referral/index.js";
 import gemsRouter from "./routes/gems/index.js";
+import chatRouter from "./routes/chat/index.js";
 import adminRouter from "./routes/admin/auth.js";
 import adminUserRouter from "./routes/admin/user.js";
 import adminReferralRouter from "./routes/admin/referral.js";
@@ -45,6 +46,7 @@ app.use("/api/", profileRouter);
 app.use("/api/", likeRouter);
 app.use("/api/", referralRouter);
 app.use("/api/", gemsRouter);
+app.use("/api/", chatRouter);
 
 app.use("/api/admin", adminRouter);
 app.use("/api/admin", adminUserRouter);
