@@ -51,20 +51,18 @@ const register = async (req, res) => {
       );
     }
 
-    let profile = req.files["profile"][0] ? req.files["profile"][0].filename : "";
+    // let profile = req.files["profile"][0] ? req.files["profile"][0].filename : "";
 
-    let photos = req.files["photos"] ? req.files["photos"] : [];
+    // let photos = req.files["photos"] ? req.files["photos"] : [];
 
-    if (photos != null && photos.length >= 0) {
-      photos = photos.map((photo) => {
-        return photo.filename;
-      });
-    }
+    // if (photos != null && photos.length >= 0) {
+    //   photos = photos.map((photo) => {
+    //     return photo.filename;
+    //   });
+    // }
     photos = JSON.stringify(photos);
 
     let createFormData = req.body;
-
-    createFormData = { ...createFormData, profile, photos };
 
     let user = await User.create(createFormData);
 
