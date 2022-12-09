@@ -171,8 +171,10 @@ const update = async (req, res) => {
     throw new IfRequired("please provide all required inputs");
   }
 
+  res.json(req.body)
+
   const find = await User.findOne({
-    _id: mongoose.Types.ObjectId(req.params.userid),
+    _id: req.params.userid
   });
 
   if (find) {
@@ -180,7 +182,7 @@ const update = async (req, res) => {
   }
 
   const user = await User.findOne({
-    _id: mongoose.Types.ObjectId(req.params.userid),
+    _id: req.params.userid
   });
 
   res.status(200).json({ message: "updated successfully", user });

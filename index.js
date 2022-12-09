@@ -1,6 +1,5 @@
 import cors from "cors";
 import express from "express";
-import bodyParser from "body-parser";
 const app = express();
 
 /* process env allowed */
@@ -29,7 +28,8 @@ import adminMatchesRouter from "./routes/admin/match.js";
 import mongoose from "mongoose";
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({extended:true, parameterLimit:100000, limit: "500mb"}));
+// app.use(express.urlencoded());
 app.use(express.static("public"));
 
 app.use("/media", express.static("media"));
