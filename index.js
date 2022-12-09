@@ -29,7 +29,6 @@ import mongoose from "mongoose";
 
 app.use(cors());
 app.use(express.json({extended:true, parameterLimit:100000, limit: "500mb"}));
-// app.use(express.urlencoded());
 app.use(express.static("public"));
 
 app.use("/media", express.static("media"));
