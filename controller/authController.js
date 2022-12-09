@@ -39,8 +39,7 @@ const account = async (req, res) => {
 
 const register = async (req, res) => {
   try {
-    // res.status(StatusCodes.OK).json(req.body);
-    // return ;
+    
     if (isEmptyObject(req.body)) {
       throw new IfRequired("please provide all required inputs");
     }
@@ -52,9 +51,8 @@ const register = async (req, res) => {
       );
     }
 
-    let profile = JSON.stringify(
-      req.files["profile"][0] ? req.files["profile"][0].path : ""
-    );
+    let profile = req.files["profile"][0] ? req.files["profile"][0].filename : "";
+
     let photos = req.files["photos"] ? req.files["photos"] : [];
 
     if (photos != null && photos.length >= 0) {

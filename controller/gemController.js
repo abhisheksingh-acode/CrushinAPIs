@@ -32,6 +32,20 @@ const history = async (req, res) => {
   res.status(StatusCodes.OK).json(available);
 };
 
+const transactions = async (req, res) => {
+  const data = await Gem.find().sort("-_id").exec();
+  
+  res.status(StatusCodes.OK).json(data);
+};
+
+const detail = async (req, res) => {
+  const id = req.params.id;
+
+  const data = await Gem.findOne().where("_id").equals(id).exec();
+
+  res.status(StatusCodes.OK).json(data);
+};
+
 const credit = async (req, res) => {
   const user_id = req.params.user_id;
 
@@ -82,4 +96,4 @@ const debit = async (req, res) => {
   res.status(StatusCodes.OK).json(result);
 };
 
-export { credit, debit, available, history };
+export { credit, debit, available, history, transactions, detail };

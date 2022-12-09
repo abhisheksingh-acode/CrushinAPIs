@@ -9,19 +9,19 @@ const ChatSchema = new mongoose.Schema({
     type: String,
     required: [true, "profile id is required"],
   },
-  messsage: {
+  content: {
     type: String,
     required: [true, "transaction is required"],
   },
   type: {
-    type: String,
-    required:[true, "chat type is required text/file"]
-  },
-  status: {
     type: Boolean,
-    default:true
+    required: [true, "chat type is required text/file"],
   },
-  time: { type: Date, default: Date.now },
+  read: {
+    type: Boolean,
+    default: false,
+  },
+  date: { type: Date, default: Date.now },
 });
 
 export default mongoose.model("Chat", ChatSchema);

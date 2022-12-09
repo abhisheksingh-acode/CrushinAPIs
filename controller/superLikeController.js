@@ -61,6 +61,12 @@ const purchase = async (req, res) => {
   });
 };
 
+const transactions = async (req, res) => {
+  const data = await SuperLike.find().sort("-_id").exec();
+
+  res.status(StatusCodes.OK).json(data);
+};
+
 const history = async (req, res) => {
   const user_id = req.params.user_id;
 
@@ -73,4 +79,4 @@ const history = async (req, res) => {
   res.status(StatusCodes.OK).json(available);
 };
 
-export { purchase, history };
+export { purchase, transactions, history };

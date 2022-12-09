@@ -41,7 +41,7 @@ const UserSchema = new mongoose.Schema({
   interests: {
     type: String,
     required: [true, "interests are required"],
-    default: "not set",
+    default: "[\"not set\"]",
   },
   gender: {
     type: String,
