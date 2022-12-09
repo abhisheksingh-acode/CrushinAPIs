@@ -171,8 +171,6 @@ const update = async (req, res) => {
     throw new IfRequired("please provide all required inputs");
   }
 
-  res.json(req.body)
-
   const find = await User.findOne({
     _id: req.params.userid
   });
