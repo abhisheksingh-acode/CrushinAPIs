@@ -60,7 +60,7 @@ const register = async (req, res) => {
     //     return photo.filename;
     //   });
     // }
-    photos = JSON.stringify(photos);
+    // photos = JSON.stringify(photos);
 
     let createFormData = req.body;
 
