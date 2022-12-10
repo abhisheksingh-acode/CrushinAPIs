@@ -15,7 +15,7 @@ const ACTION = {
 const LikeSchema = new mongoose.Schema({
   user_id: {
     type: String,
-    required: [true, "user id is required"],
+    required: [true,'user id is required']
   },
   profile_id: {
     type: String,

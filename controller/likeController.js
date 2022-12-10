@@ -6,9 +6,16 @@ import { StatusCodes } from "http-status-codes";
 /* likes for account logged */
 const likes = async (req, res) => {
   const user_id = req.params.user_id;
-  const data = await Like.find().where("user_id").equals(user_id).exec();
 
-  res.status(StatusCodes.OK).json(data);
+  const data = await Like.find()
+  .where("user_id")
+  .equals(user_id)
+  .exec();
+  // try {
+
+    res.status(StatusCodes.OK).json(data);
+
+
 };
 
 const requests = async (req, res) => {
