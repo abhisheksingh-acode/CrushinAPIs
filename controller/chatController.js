@@ -12,8 +12,12 @@ const chats = async (req, res) => {
   }
   const user_id = req.params.user_id;
 
-  const data = await Chat.find().distinct("user_id")
-    
+  const data = await Chat.find()
+    .and([
+      { $or: [{ user_id: user_id }, { profile_id: user_id }] },
+    ])
+    .select({user_id:1, profile_id:1, content: 1, type: 1, date: 1})
+    .exec();
 
   res.json(data);
 };
