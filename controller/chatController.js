@@ -19,11 +19,6 @@ const chats = async (req, res) => {
     ])
     .exec();
 
-    
-
-
-
-
   res.json(data);
 };
 const connect = async (req, res) => {
