@@ -12,15 +12,12 @@ const chats = async (req, res) => {
   }
   const user_id = req.params.user_id;
 
-  const data = await Like.find()
-    .and([
-      { $or: [{ user_id: user_id }, { profile_id: user_id }] },
-      { $or: [{ accept: true }] },
-    ])
-    .exec();
+  const data = await Chat.find().distinct("user_id")
+    
 
   res.json(data);
 };
+
 const connect = async (req, res) => {
   if (req.params.user_id == null || req.params.profile_id == null) {
     throw new IfRequired("cannot create chat room without user access");
@@ -35,7 +32,6 @@ const connect = async (req, res) => {
 
 
 };
-
 
 const post = async (req, res) => {
 
@@ -60,6 +56,8 @@ const post = async (req, res) => {
   res.json({data,all});
 
 };
+
+
 const destroy = async (req, res) => {
   res.json({ send: true });
 };
