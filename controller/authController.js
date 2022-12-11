@@ -54,7 +54,7 @@ const register = async (req, res) => {
 
     let user = await User.create(createFormData);
 
-    const checkRef = await Referral.findOne({ phone: req.body.phone });
+    const checkRef = await Referral.findOne({ phone: req.body.phone, status: false });
 
     if (checkRef) {
       await checkRef.updateOne({ status: true, label: STATUS.SUCCESS });
