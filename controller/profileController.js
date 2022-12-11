@@ -1,9 +1,12 @@
 import User from "../models/User.js";
 import Like from "../models/Like.js";
 import SuperLike from "../models/SuperLike.js";
-import Notification, {SUBJECT, NOTIFICATION, TYPE } from "../models/Notification.js";
+import Notification, {
+  SUBJECT,
+  NOTIFICATION,
+  TYPE,
+} from "../models/Notification.js";
 import { StatusCodes } from "http-status-codes";
-
 
 /* helper function */
 import { create, read } from "../helpers/createNotification.js";
@@ -11,12 +14,67 @@ import { create, read } from "../helpers/createNotification.js";
 /* profiles */
 const profiles = async (req, res) => {
   const user_id = req.body.user_id;
-  const data = await User.find()
-    .select({ name: 1, birthday: 1, bio: 1, profile: 1 })
-    .where({ _id: { $ne: user_id } })
-    .exec();
 
-  res.status(StatusCodes.OK).json(data);
+  const user = await User.findOne({ _id: user_id });
+
+  const {
+    relation_find,
+    relation_type,
+    habit_drink,
+    habit_smoke,
+    religion,
+    politics_view,
+    location,
+    age,
+  } = user;
+
+  var profileGender = null;
+
+  switch (relation_find) {
+    case "Man":
+      profileGender = ["Male"];
+      break;
+    case "Women":
+      profileGender = ["Female"];
+      break;
+    case "Non binary":
+      profileGender = ["Male", "Female"];
+      break;
+    case "I’m open for everyone":
+      profileGender = ["Male", "Female", "Bisexsual", "Gay"];
+      break;
+  }
+
+  const data = await User.find()
+    .select({
+      name: 1,
+      birthday: 1,
+      bio: 1,
+      profile: 1,
+      gender: 1,
+    })
+    .where("gender", {
+      $in: [...profileGender],
+    })
+    .where({
+      habit_smoke,
+      habit_drink,
+    })
+    .where("_id", { $ne: user_id });
+
+  //
+
+  // const likedProfiles = await Like.find()
+  //   .and({
+  //     $or: [{ profile_id: user_id }, { user_id: user_id }],
+  //   })
+  //   .select({ user_id: 1, profile_id: 1, _id: -1 })
+  //   .where("user_id", { $ne: user_id })
+  //   .where({ status: true, accept: false });
+
+  const likedProfiles = await Like.find().where({ user_id: user_id });
+
+  res.status(StatusCodes.OK).json(likedProfiles);
 };
 
 /* profile view */
@@ -39,16 +97,61 @@ const profilesView = async (req, res) => {
 const profileLike = async (req, res) => {
   const profile = req.params.profile_id;
   req.body.profile_id = profile;
-  const { user_id, label, status, accept, profile_id } = req.body;
-  const checkRecord = await Like.findOne({ user_id, profile_id });
+  const { user_id, label, status, accept, profile_id, action } = req.body;
+
+  const checkRecord = await Like.findOne().where({
+    $or: [{ profile_id: user_id }, { user_id: user_id }],
+  });
+
+  const checkMyRole = checkRecord.user_id == user_id ? true : false;
+
+  // if like record exist don't create like doc again just update one
   if (checkRecord) {
-    res.status(StatusCodes.OK).json({ message: "liked already this profile" });
+    const updateRecord = await Like.updateOne({ status, accept, action });
+
+    if (updateRecord) {
+      if (status && accept) {
+        if (checkMyRole) {
+          const notifyUser = create(
+            profile_id,
+            user_id,
+            TYPE.MATCHED,
+            SUBJECT.MATCHED,
+            NOTIFICATION.MATCHED
+          );
+        } else {
+          const notifyProfile = create(
+            user_id,
+            profile_id,
+            TYPE.MATCHED,
+            SUBJECT.MATCHED,
+            NOTIFICATION.MATCHED
+          );
+        }
+      }
+    }
+
+    res.status(StatusCodes.OK).json({
+      message: checkMyRole
+        ? "you have liked someone"
+        : "you were liked by someone",
+    });
 
     return;
   }
+
+  // if like record don't exist create like doc and send notification to profile guy
   const data = await Like.create(req.body);
 
-  const notify = create(user_id, profile_id, TYPE.LIKED, SUBJECT.LIKED, NOTIFICATION.LIKED);
+  if (data.status && data.action) {
+    const notify = create(
+      user_id,
+      profile_id,
+      TYPE.LIKED,
+      SUBJECT.LIKED,
+      NOTIFICATION.LIKED
+    );
+  }
 
   res.status(StatusCodes.OK).json(data);
 };
@@ -180,10 +283,10 @@ const notifications = async (req, res) => {
 
 const notificationRead = async (req, res) => {
   const id = req.params.id;
-  const result = await Notification.findOne({_id:id})
-  await result.updateOne({read:true});
+  const result = await Notification.findOne({ _id: id });
+  await result.updateOne({ read: true });
 
-  res.status(StatusCodes.OK).json({message:'marked as read'});
+  res.status(StatusCodes.OK).json({ message: "marked as read" });
 };
 
 export {

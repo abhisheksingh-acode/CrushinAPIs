@@ -2,6 +2,8 @@ import mongoose from "mongoose";
 
 import SuperLike from "./SuperLike.js";
 
+import User from "./User.js";
+
 const LABEL = {
   PENDING: "pending",
   ACCEPT: "accepted",
@@ -14,12 +16,12 @@ const ACTION = {
 
 const LikeSchema = new mongoose.Schema({
   user_id: {
-    type: String,
-    required: [true,'user id is required']
+    type: mongoose.Types.ObjectId,
+    ref: "User",
   },
   profile_id: {
-    type: String,
-    required: [true, "profile id is required"],
+    type: mongoose.Types.ObjectId,
+    ref: "User",
   },
   label: {
     type: String,
@@ -27,12 +29,13 @@ const LikeSchema = new mongoose.Schema({
     default: LABEL.PENDING,
   },
   action: {
-    type: String,
+    type: Boolean,
+    required: [true, "action required Like OR Dislike"],
   },
   // like or dislike
   status: {
     type: Boolean,
-    required: [true],
+    required: [true, "need status to know request is rejected OR pending"],
     default: false,
   },
   isSuper: {
@@ -54,7 +57,7 @@ const LikeSchema = new mongoose.Schema({
 LikeSchema.pre("save", async function () {
   if (this.status && this.accept) {
     this.label = LABEL.ACCEPT;
-  } else if (this.status && !this.accept) {
+  } else if (this.status && !this.action && !this.accept) {
     this.label = LABEL.REJECT;
   } else {
     this.label = LABEL.PENDING;

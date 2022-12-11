@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 
+import User from "./User.js";
+
 const SUBJECT = {
   LIKED: "Profile liked",
   SUPERLIKED: "Profile superliked",
@@ -25,16 +27,16 @@ const TYPE = {
 
 const NotificationSchema = new mongoose.Schema({
   user_id: {
-    type: String,
-    required: [true, "user id is required"],
+    type: mongoose.Types.ObjectId,
+    ref: "User",
   },
   type: {
     type: String,
     required: [true, "subject is required"],
   },
   profile_id: {
-    type: String,
-    required: [true, "profile id is required"],
+    type: mongoose.Types.ObjectId,
+    ref: "User",
   },
   subject: {
     type: String,

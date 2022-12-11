@@ -18,7 +18,7 @@ const UserSchema = new mongoose.Schema({
       validator: validator.isEmail,
       message: "provide a valid email address",
     },
-    unique: [true, "email is already in use."]
+    unique: [true, "email is already in use."],
   },
   name: {
     type: String,
@@ -41,7 +41,7 @@ const UserSchema = new mongoose.Schema({
   interests: {
     type: String,
     required: [true, "interests are required"],
-    default: "[\"not set\"]",
+    default: '["not set"]',
   },
   gender: {
     type: String,
@@ -51,6 +51,9 @@ const UserSchema = new mongoose.Schema({
   birthday: {
     type: Date,
     required: [true, "date of birth is required"],
+  },
+  age: {
+    type: Number,
   },
   relation_type: {
     type: String,
@@ -83,12 +86,12 @@ const UserSchema = new mongoose.Schema({
     max: 100,
     required: [true, "bio is required"],
   },
-  profile:{
-   type: String,
-   required: [true,'profile picture is required'],
+  profile: {
+    type: String,
+    required: [true, "profile picture is required"],
   },
-  photos:{
-   type: String,
+  photos: {
+    type: String,
   },
   location: {
     type: String,
@@ -97,7 +100,7 @@ const UserSchema = new mongoose.Schema({
   },
   privacy: {
     type: Boolean,
-    default:false
+    default: false,
   },
   phoneotp: {
     type: String,
@@ -107,7 +110,12 @@ const UserSchema = new mongoose.Schema({
 
 UserSchema.pre("save", async function () {
   const saltRounds = 10;
-  this.password = await bcrypt.hash(this.password,saltRounds);
+
+  const cYear = new Date().getFullYear();
+  const dYear = new Date(this.birthday).getFullYear();
+  this.age = cYear - dYear;
+
+  this.password = await bcrypt.hash(this.password, saltRounds);
 });
 
 UserSchema.methods.createJWT = function () {
@@ -116,6 +124,13 @@ UserSchema.methods.createJWT = function () {
   });
 };
 
-export {UserSchema};
+UserSchema.methods.updateAge = function () {
+  const cYear = new Date().getFullYear();
+  const dYear = new Date(this.birthday).getFullYear();
+  this.age = cYear - dYear;
+  return this.age;
+};
+
+export { UserSchema };
 
 export default mongoose.model("User", UserSchema);

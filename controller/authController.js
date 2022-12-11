@@ -183,6 +183,8 @@ const update = async (req, res) => {
     _id: req.params.userid
   });
 
+  user.updateAge()
+
   res.status(200).json({ message: "updated successfully", user });
 };
 
