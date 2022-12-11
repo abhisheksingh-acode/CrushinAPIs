@@ -107,7 +107,7 @@ const profileLike = async (req, res) => {
   // if like record exist don't create like doc again just update one
   if (checkRecord) {
     const checkMyRole = checkRecord.user_id == user_id ? true : false;
-    const updateRecord = await Like.updateOne({ status, accept, action });
+    const updateRecord = await checkRecord.updateOne({ status, accept, action });
 
     if (updateRecord) {
       if (status && accept) {
