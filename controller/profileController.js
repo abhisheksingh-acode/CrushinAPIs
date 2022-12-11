@@ -74,7 +74,7 @@ const profiles = async (req, res) => {
 
   const likedProfiles = await Like.find().where({ user_id: user_id });
 
-  res.status(StatusCodes.OK).json(likedProfiles);
+  res.status(StatusCodes.OK).json(data);
 };
 
 /* profile view */
