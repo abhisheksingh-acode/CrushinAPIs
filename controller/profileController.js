@@ -50,6 +50,7 @@ const profiles = async (req, res) => {
       name: 1,
       birthday: 1,
       bio: 1,
+      age:1,
       profile: 1,
       gender: 1,
     })
