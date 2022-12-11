@@ -13,7 +13,8 @@ const purchase = async (req, res) => {
 
   const transaction = req.body.transaction;
 
-  const price = (transaction / QUANTITY) * PRICE;
+  const price = Math.ceil((transaction / QUANTITY) * PRICE);
+
 
   const gems = await Gem.findOne()
     .where("user_id")

@@ -49,7 +49,7 @@ GemSchema.pre("save", async function () {
   } else {
     this.status = TYPE.DEBIT;
     this.label = LABEL.PURCHASE;
-    this.available -= this.transaction;
+    this.available = Math.ceil(this.available - this.transaction);
   }
 });
 
