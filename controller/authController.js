@@ -39,7 +39,6 @@ const account = async (req, res) => {
 
 const register = async (req, res) => {
   try {
-    
     if (isEmptyObject(req.body)) {
       throw new IfRequired("please provide all required inputs");
     }
@@ -51,17 +50,6 @@ const register = async (req, res) => {
       );
     }
 
-    // let profile = req.files["profile"][0] ? req.files["profile"][0].filename : "";
-
-    // let photos = req.files["photos"] ? req.files["photos"] : [];
-
-    // if (photos != null && photos.length >= 0) {
-    //   photos = photos.map((photo) => {
-    //     return photo.filename;
-    //   });
-    // }
-    // photos = JSON.stringify(photos);
-
     let createFormData = req.body;
 
     let user = await User.create(createFormData);
@@ -71,7 +59,6 @@ const register = async (req, res) => {
     if (checkRef) {
       await checkRef.updateOne({ status: true, label: STATUS.SUCCESS });
     }
-
     let token = user.createJWT();
     res.status(StatusCodes.CREATED).json({ user, token });
   } catch (error) {
@@ -124,8 +111,11 @@ const loginVerify = async (req, res) => {
 
     if (user && checkPassword) {
       const token = user.createJWT();
-      res.status(StatusCodes.OK).json({ token, user });
+      const gems = await availableGems(user._id);
+      const superlikes = await availableSuperLikes(user._id);
+      
 
+      res.status(StatusCodes.OK).json({ token, user, gems, superlikes });
       return;
     }
     res
@@ -172,7 +162,7 @@ const update = async (req, res) => {
   }
 
   const find = await User.findOne({
-    _id: req.params.userid
+    _id: req.params.userid,
   });
 
   if (find) {
@@ -180,10 +170,10 @@ const update = async (req, res) => {
   }
 
   const user = await User.findOne({
-    _id: req.params.userid
+    _id: req.params.userid,
   });
 
-  user.updateAge()
+  user.updateAge();
 
   res.status(200).json({ message: "updated successfully", user });
 };
