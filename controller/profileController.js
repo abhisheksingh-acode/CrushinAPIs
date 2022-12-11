@@ -97,16 +97,16 @@ const profilesView = async (req, res) => {
 const profileLike = async (req, res) => {
   const profile = req.params.profile_id;
   req.body.profile_id = profile;
+
   const { user_id, label, status, accept, profile_id, action } = req.body;
 
   const checkRecord = await Like.findOne().where({
     $or: [{ profile_id: user_id }, { user_id: user_id }],
   });
 
-  const checkMyRole = checkRecord.user_id == user_id ? true : false;
-
   // if like record exist don't create like doc again just update one
   if (checkRecord) {
+    const checkMyRole = checkRecord.user_id == user_id ? true : false;
     const updateRecord = await Like.updateOne({ status, accept, action });
 
     if (updateRecord) {
