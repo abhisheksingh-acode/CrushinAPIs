@@ -280,8 +280,8 @@ const notifications = async (req, res) => {
   const result = await Notification.find()
     .where("profile_id")
     .equals(user_id)
-    .populate({ path: "user_id", select: "name profile" })
-    .populate({ path: "profile_id", select: "name profile" })
+    .populate({ path: "user_id", select: "name profile age" })
+    .populate({ path: "profile_id", select: "name profile age" })
     .sort("-_id")
 
   res.status(StatusCodes.OK).json(result);
