@@ -24,7 +24,7 @@ const requests = async (req, res) => {
 
 const detail = async (req, res) => {
   const user_id = req.params.id;
-  const data = await Like.findOne().where("user_id").equals(user_id).populate("user")
+  const data = await Like.findOne().where("user_id").equals(user_id).populate({ path: "user_id"})
 
   res.status(StatusCodes.OK).json(data);
 };
