@@ -18,7 +18,10 @@ const getUnread = async (user_id) => {
 
 const create = async (user_id, profile_id, type, subject, message) => {
   const checkRecord = await Notification.find().where({
-    $or: [{ user_id }, { profile_id }],
+    $or: [
+      { user_id, profile_id },
+      { profile_id, user_id },
+    ],
   });
 
   if (checkRecord && checkRecord.length > 0) {
