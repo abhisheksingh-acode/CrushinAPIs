@@ -14,7 +14,8 @@ const chats = async (req, res) => {
 
   const data = await Chat.find()
     .and([{ $or: [{ user_id: user_id }, { profile_id: user_id }] }])
-    .select({ user_id: 1, profile_id: 1, content: 1, type: 1, date: 1 })
+    .populate({ path: "user_id", select: "name profile _id" })
+    .populate({ path: "profile_id", select: "name profile _id" })
     .exec();
 
   res.json(data);
@@ -32,8 +33,9 @@ const connect = async (req, res) => {
     .equals(user_id)
     .where("profile_id")
     .equals(profile_id)
+    .populate({ path: "user_id", select: "name profile age" })
+    .populate({ path: "profile_id", select: "name profile age" })
     .sort("-_id")
-    .exec();
 
   res.json({ messages });
 };
@@ -56,6 +58,8 @@ const post = async (req, res) => {
     user_id,
     profile_id,
   })
+  .populate({ path: "user_id", select: "name profile age" })
+    .populate({ path: "profile_id", select: "name profile age" })
     .sort("-_id")
     .exec();
 
