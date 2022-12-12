@@ -8,10 +8,8 @@ const getUnread = async (user_id) => {
   const result = await Notification.find()
     .where("user_id")
     .equals(user_id)
-    .sort("-_id")
-    .where("read")
-    .equals(false)
-    .exec();
+    .populate({path:"user_id", select: "profile name _id"})
+    .populate({path:"profile_id", select: "profile name _id"})
 
   return result;
 };

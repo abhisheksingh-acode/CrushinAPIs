@@ -30,13 +30,13 @@ const NotificationSchema = new mongoose.Schema({
     type: mongoose.Types.ObjectId,
     ref: "User",
   },
-  type: {
-    type: String,
-    required: [true, "subject is required"],
-  },
   profile_id: {
     type: mongoose.Types.ObjectId,
     ref: "User",
+  },
+  type: {
+    type: String,
+    required: [true, "subject is required"],
   },
   subject: {
     type: String,
