@@ -14,7 +14,6 @@ import { create, read } from "../helpers/createNotification.js";
 /* profiles */
 const profiles = async (req, res) => {
   const user_id = req.body.user_id;
-
   const user = await User.findOne({ _id: user_id });
 
   const {
@@ -68,15 +67,32 @@ const profiles = async (req, res) => {
 
   //
 
-  const likedProfiles = await Like.find()
-    .and({
-      $or: [{ profile_id: user_id }, { user_id: user_id }],
-    })
-    .where({ status: true, accept: false });
+  const likedProfiles = await Like.find().where({
+    $or: [{ user_id: user_id }, { profile_id: user_id }],
+  });
 
-  // const likedProfiles = await Like.find().where({ user_id: user_id });
+  // if (likedProfiles.length > 0) {
+  const filterByReference = (arr1, arr2) => {
+    let resolve = [];
+    resolve = arr1.filter((el) => {
+      return !arr2.find((element) => {
+        return element.profile_id === el._id || element.user_id === el._id;
+      });
+    });
+    return res.json(resolve);
+  };
 
-  res.status(StatusCodes.OK).json(likedProfiles);
+  if (likedProfiles.length > data.length) {
+    filterByReference(data, likedProfiles);
+    return;
+  }
+  if (likedProfiles.length < data.length) {
+    filterByReference(likedProfiles, data);
+    return;
+  }
+  // console.log();
+
+  res.json(filterByReference(data, likedProfiles));
 };
 
 /* profile view */
@@ -160,7 +176,6 @@ const profileLike = async (req, res) => {
       NOTIFICATION.LIKED
     );
   }
-
   res.status(StatusCodes.OK).json(data);
 };
 
