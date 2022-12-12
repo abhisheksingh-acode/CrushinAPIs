@@ -13,12 +13,20 @@ const chats = async (req, res) => {
   const user_id = req.params.user_id;
 
   const data = await Chat.find()
-    .and([{ $or: [{ user_id: user_id }, { profile_id: user_id }] }])
-    .populate({ path: "user_id", select: "name profile _id" })
-    .populate({ path: "profile_id", select: "name profile _id" })
-    .exec();
+    .where("profile_id", { $ne: user_id })
+    .distinct("profile_id");
 
-  res.json(data);
+  const chatList = await Chat.find()
+  .where({
+    profile_id:{
+      $in: [...data]
+    }
+  }).sort("-_id")
+  .limit(1)
+    .populate({ path: "user_id", select: "name profile _id" })
+    .populate({ path: "profile_id", select: "name profile _id" });
+
+  res.json(chatList);
 };
 
 const connect = async (req, res) => {
@@ -35,7 +43,7 @@ const connect = async (req, res) => {
     .equals(profile_id)
     .populate({ path: "user_id", select: "name profile age" })
     .populate({ path: "profile_id", select: "name profile age" })
-    .sort("-_id")
+    .sort("-_id");
 
   res.json({ messages });
 };
@@ -58,7 +66,7 @@ const post = async (req, res) => {
     user_id,
     profile_id,
   })
-  .populate({ path: "user_id", select: "name profile age" })
+    .populate({ path: "user_id", select: "name profile age" })
     .populate({ path: "profile_id", select: "name profile age" })
     .sort("-_id")
     .exec();
