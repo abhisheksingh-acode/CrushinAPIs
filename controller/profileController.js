@@ -43,6 +43,9 @@ const profiles = async (req, res) => {
     case "I’m open for everyone":
       profileGender = ["Male", "Female", "Bisexsual", "Gay"];
       break;
+    default:
+      profileGender = ["Male", "Female", "Bisexsual", "Gay"];
+      break;
   }
 
   const data = await User.find()
@@ -282,7 +285,7 @@ const notifications = async (req, res) => {
     .equals(user_id)
     .populate({ path: "user_id", select: "name profile age" })
     .populate({ path: "profile_id", select: "name profile age" })
-    .sort("-_id")
+    .sort("-_id");
 
   res.status(StatusCodes.OK).json(result);
 };
