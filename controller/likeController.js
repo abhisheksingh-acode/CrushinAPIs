@@ -9,8 +9,8 @@ const likes = async (req, res) => {
 
   const data = await Like.find()
     .where({ user_id, status: true, action: true })
-    .populate({ path: "user_id", select: "name profile -_id" })
-    .populate({ path: "profile_id", select: "name profile -_id" });
+    .populate({ path: "user_id", select: "name profile" })
+    .populate({ path: "profile_id", select: "name profile" });
 
   res.status(StatusCodes.OK).json(data);
 };
