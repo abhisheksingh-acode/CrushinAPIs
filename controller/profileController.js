@@ -47,46 +47,42 @@ const profiles = async (req, res) => {
       break;
   }
 
-  const data = await User.find()
-    .select({
-      name: 1,
-      birthday: 1,
-      bio: 1,
-      age: 1,
-      profile: 1,
-      gender: 1,
-    })
-    .where("gender", {
-      $in: [...profileGender],
-    })
-    .where({
-      habit_smoke,
-      habit_drink,
-    })
-    .where("_id", { $ne: user_id });
-
-  //
-
-  const likedProfiles = await Like.find().where({
-    $or: [{ user_id: user_id }, { profile_id: user_id }],
+  const data = await User.aggregate([
+    {
+      $lookup: {
+        from: "likes",
+        localField: "_id",
+        foreignField: "user_id",
+        as: "likes",
+      },
+    },
+  ]).match({
+    gender: { $in: [...profileGender] },
   });
 
-  // if (likedProfiles.length > 0) {
-  const filterByReference = (arr1, arr2) => {
-    let resolve = [];
-    resolve = arr1.filter((el) => {
-      return !arr2.find((element) => {
-        return element.profile_id === el._id || element.user_id === el._id;
-      });
-    });
-    return res.json(resolve);
-  };
+  res.json(data);
+  //
 
-    filterByReference(data, likedProfiles);
-    return;
+  // const likedProfiles = await Like.find().where({
+  //   $or: [{ user_id: user_id }, { profile_id: user_id }],
+  // });
+
+  // if (likedProfiles.length > 0) {
+  // const filterByReference = (arr1, arr2) => {
+  //   let resolve = [];
+  //   resolve = arr1.filter((el) => {
+  //     return !arr2.find((element) => {
+  //       return element.profile_id === el._id || element.user_id === el._id;
+  //     });
+  //   });
+  //   return res.json(resolve);
+  // };
+
+  //   filterByReference(data, likedProfiles);
+  //   return;
   // console.log();
 
-  res.json(filterByReference(data, likedProfiles));
+  // res.json(filterByReference(data, likedProfiles));
 };
 
 /* profile view */
