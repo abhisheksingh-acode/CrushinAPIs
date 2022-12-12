@@ -18,7 +18,7 @@ import {
 
 router.post("/likes/:user_id/list", UserTokenAuth, likes);
 router.post("/likes/:user_id/request", UserTokenAuth, requests);
-router.post("/like/:id/details", UserTokenAuth, detail);
+router.post("/like/:id/details/:profile_id", UserTokenAuth, detail);
 // router.post("/profiles/:id", UserTokenAuth, profilesView);
 
 // router.post("/profile/:id/like", UserTokenAuth, profileLike);
