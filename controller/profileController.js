@@ -82,14 +82,8 @@ const profiles = async (req, res) => {
     return res.json(resolve);
   };
 
-  if (likedProfiles.length > data.length) {
     filterByReference(data, likedProfiles);
     return;
-  }
-  if (likedProfiles.length < data.length) {
-    filterByReference(likedProfiles, data);
-    return;
-  }
   // console.log();
 
   res.json(filterByReference(data, likedProfiles));
