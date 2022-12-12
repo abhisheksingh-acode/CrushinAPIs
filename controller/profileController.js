@@ -68,17 +68,15 @@ const profiles = async (req, res) => {
 
   //
 
-  // const likedProfiles = await Like.find()
-  //   .and({
-  //     $or: [{ profile_id: user_id }, { user_id: user_id }],
-  //   })
-  //   .select({ user_id: 1, profile_id: 1, _id: -1 })
-  //   .where("user_id", { $ne: user_id })
-  //   .where({ status: true, accept: false });
+  const likedProfiles = await Like.find()
+    .and({
+      $or: [{ profile_id: user_id }, { user_id: user_id }],
+    })
+    .where({ status: true, accept: false });
 
-  const likedProfiles = await Like.find().where({ user_id: user_id });
+  // const likedProfiles = await Like.find().where({ user_id: user_id });
 
-  res.status(StatusCodes.OK).json(data);
+  res.status(StatusCodes.OK).json(likedProfiles);
 };
 
 /* profile view */
@@ -173,7 +171,15 @@ const profileLikeHandle = async (req, res) => {
   const result = await like.updateOne(req.body);
 
   if (result && req.body.accept) {
-    const notify = create(
+    const notifyProfile = create(
+      like.user_id,
+      like.profile_id,
+      TYPE.MATCHED,
+      SUBJECT.MATCHED,
+      NOTIFICATION.MATCHED
+    );
+
+    const notifyUser = create(
       like.profile_id,
       like.user_id,
       TYPE.MATCHED,
