@@ -50,7 +50,7 @@ const profiles = async (req, res) => {
       name: 1,
       birthday: 1,
       bio: 1,
-      age:1,
+      age: 1,
       profile: 1,
       gender: 1,
     })
@@ -102,13 +102,20 @@ const profileLike = async (req, res) => {
   const { user_id, label, status, accept, profile_id, action } = req.body;
 
   const checkRecord = await Like.findOne().where({
-    $or: [{ profile_id: user_id }, { user_id: user_id }],
+    $or: [
+      { profile_id: user_id, user_id: profile_id },
+      { user_id: user_id, profile_id: profile_id },
+    ],
   });
 
   // if like record exist don't create like doc again just update one
   if (checkRecord) {
     const checkMyRole = checkRecord.user_id == user_id ? true : false;
-    const updateRecord = await checkRecord.updateOne({ status, accept, action });
+    const updateRecord = await checkRecord.updateOne({
+      status,
+      accept,
+      action,
+    });
 
     if (updateRecord) {
       if (status && accept) {
@@ -130,15 +137,14 @@ const profileLike = async (req, res) => {
           );
         }
       }
+
+      return res.status(StatusCodes.OK).json({
+        message: checkMyRole
+          ? "you have liked someone"
+          : "you were liked by someone",
+        updated: checkRecord,
+      });
     }
-
-    res.status(StatusCodes.OK).json({
-      message: checkMyRole
-        ? "you have liked someone"
-        : "you were liked by someone",
-    });
-
-    return;
   }
 
   // if like record don't exist create like doc and send notification to profile guy
