@@ -68,13 +68,15 @@ const post = async (req, res) => {
   const user_id = req.params.user_id;
   const profile_id = req.params.profile_id;
 
+  const {type, content} = req.body
+
   let openChatID = `${user_id}${profile_id}`;
 
   const data = await Chat.create({
-    chat_id:openChatID,
     s_id:user_id,
     r_id: profile_id,
-    ...req.body,
+    type,
+    content,
     read: true,
   });
 
