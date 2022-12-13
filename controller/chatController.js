@@ -30,8 +30,6 @@ const chats = async (req, res) => {
       })
       .sort("-_id")
       .limit(1);
-
-    console.log(lastMessage);
     return lastMessage;
   };
 
@@ -41,11 +39,13 @@ const chats = async (req, res) => {
       const lastMessage = await findLast(el.user_id._id, el.profile_id._id);
 
       console.log(lastMessage);
-      return { ...el._doc, last: lastMessage };
+      return { ...el._doc, last: lastMessage, sortid: lastMessage !== null ? lastMessage.date : el.profile_id.date };
     })
   );
 
-  res.json(newMatch);
+  let descresult = newMatch.sort((a, b) => Date.parse(new Date(b.sortid)) - Date.parse(new Date(a.sortid)));
+
+  res.json(descresult);
 };
 
 const connect = async (req, res) => {
