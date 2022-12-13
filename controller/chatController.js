@@ -39,24 +39,37 @@ const chats = async (req, res) => {
       const lastMessage = await findLast(el.user_id._id, el.profile_id._id);
 
       console.log(lastMessage);
-      return { ...el._doc, last: lastMessage, sortid: lastMessage !== null ? lastMessage.date : el.profile_id.date };
+      return {
+        ...el._doc,
+        last: lastMessage,
+        sortid: lastMessage !== null ? lastMessage.date : el.profile_id.date,
+      };
     })
   );
 
-  let descresult = newMatch.sort((a, b) => Date.parse(new Date(b.sortid)) - Date.parse(new Date(a.sortid)));
+  let descresult = newMatch.sort(
+    (a, b) => Date.parse(new Date(b.sortid)) - Date.parse(new Date(a.sortid))
+  );
 
   res.json(descresult);
 };
 
 const connect = async (req, res) => {
-  if (req.params.chat_id == null || req.params.chat_id == null) {
+  if (req.params.s_id == null || req.params.r_id == null) {
     throw new IfRequired("chat room does not exist");
   }
-  const chat_id = req.params.chat_id;
+  const s_id = req.params.s_id;
+  const r_id = req.params.r_id;
 
-  const messages = await Chat.find({ chat_id })
-    .populate({ path: "user_id", select: "name profile age" })
-    .populate({ path: "profile_id", select: "name profile age" })
+  const messages = await Chat.find()
+    .where({
+      $or: [
+        { s_id: s_id, r_id: r_id },
+        { s_id: r_id, r_id: s_id },
+      ],
+    })
+    .populate({ path: "s_id", select: "name profile age" })
+    .populate({ path: "r_id", select: "name profile age" })
     .sort("-_id");
 
   res.json({ messages });
