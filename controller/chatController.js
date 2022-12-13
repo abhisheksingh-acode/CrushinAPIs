@@ -21,30 +21,32 @@ const chats = async (req, res) => {
     .populate({ path: "profile_id", select: "name _id profile age" });
 
   const findLast = async (uid, pid) => {
-    const lastMessage = await Chat.find()
-    .where({
-      $or: [
-        {user_id: uid, profile_id: pid},
-        {profile_id: uid, user_id: pid},
-      ]
-    })
+    const lastMessage = await Chat.findOne()
+      .where({
+        $or: [
+          { s_id: uid, r_id: pid },
+          { r_id: uid, s_id: pid },
+        ],
+      })
       .sort("-_id")
       .limit(1);
+
+    console.log(lastMessage);
     return lastMessage;
   };
 
-  const newMatch = match.map((el, index) => {
-    // let openChatID = `${el.user_id._id}${el.profile_id._id}`;
+  const newMatch = await Promise.all(
+    match.map(async (el, index) => {
+      // let openChatID = `${el.user_id._id}${el.profile_id._id}`;
+      const lastMessage = await findLast(el.user_id._id, el.profile_id._id);
 
-    const lastMessage = findLast(el.user_id._id, el.profile_id._id);
-
-    return { ...el._doc, last: lastMessage };
-  });
+      console.log(lastMessage);
+      return { ...el._doc, last: lastMessage };
+    })
+  );
 
   res.json(newMatch);
 };
-
-
 
 const connect = async (req, res) => {
   if (req.params.chat_id == null || req.params.chat_id == null) {
@@ -60,7 +62,6 @@ const connect = async (req, res) => {
   res.json({ messages });
 };
 
-
 const post = async (req, res) => {
   if (req.params.user_id == null || req.params.profile_id == null) {
     throw new IfRequired("cannot send message: some params are not receieved");
@@ -68,12 +69,12 @@ const post = async (req, res) => {
   const user_id = req.params.user_id;
   const profile_id = req.params.profile_id;
 
-  const {type, content} = req.body
+  const { type, content } = req.body;
 
   let openChatID = `${user_id}${profile_id}`;
 
   const data = await Chat.create({
-    s_id:user_id,
+    s_id: user_id,
     r_id: profile_id,
     type,
     content,
