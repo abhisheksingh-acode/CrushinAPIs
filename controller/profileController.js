@@ -91,7 +91,6 @@ const profiles = async (req, res) => {
 
       res.status(StatusCodes.OK).json(aFilter(data, result));
     });
-
 };
 
 /* profile view */
@@ -224,6 +223,8 @@ const profileSuperLike = async (req, res) => {
   const profile_id = req.params.profile_id;
   const user_id = req.params.user_id;
 
+  const { status, action, isSuper } = req.body;
+
   const available = await SuperLike.findOne()
     .where("user_id")
     .select("available")
@@ -232,9 +233,83 @@ const profileSuperLike = async (req, res) => {
     .exec();
 
   /* Already likes */
-  const checkRecord = await Like.findOne({ user_id, profile_id });
-  if (checkRecord) {
-    res.status(StatusCodes.OK).json({ message: "liked already this profile" });
+  const checkSuperLikeRecord = await Like.findOne().where({
+    $or: [
+      { profile_id: user_id, user_id: profile_id },
+      { user_id: user_id, profile_id: profile_id },
+    ],
+    status: true,
+    accept: true,
+    isSuper: true,
+  });
+
+  const checkLikeRecord = await Like.findOne().where({
+    $or: [
+      { profile_id: user_id, user_id: profile_id },
+      { user_id: user_id, profile_id: profile_id },
+    ],
+    status: true,
+    accept: true,
+  });
+
+  const checkRequestRecord = await Like.findOne().where({
+    $or: [
+      { profile_id: user_id, user_id: profile_id },
+      { user_id: user_id, profile_id: profile_id },
+    ],
+    status: true,
+    accept: false,
+  });
+
+  const checkRejectRecord = await Like.findOne().where({
+    $or: [
+      { profile_id: user_id, user_id: profile_id },
+      { user_id: user_id, profile_id: profile_id },
+    ],
+    status: false,
+    accept: false,
+  });
+
+  if (checkSuperLikeRecord) {
+    res
+      .status(StatusCodes.OK)
+      .json({ message: "Profile already have superliked" });
+    return;
+  } else if (checkLikeRecord) {
+    res.status(StatusCodes.OK).json({ message: "Profile already have liked" });
+    return;
+  } else if (checkRequestRecord) {
+    const updateLike = await checkRequestRecord.updateOne({
+      accept: action,
+      isSuper: isSuper,
+    });
+
+    if (action && isSuper) {
+      const notify = create(
+        user_id,
+        profile_id,
+        TYPE.SUPERLIKED,
+        SUBJECT.SUPERLIKED,
+        NOTIFICATION.SUPERLIKED
+      );
+    } else if (action && !isSuper) {
+      const notify = create(
+        user_id,
+        profile_id,
+        TYPE.LIKED,
+        SUBJECT.LIKED,
+        NOTIFICATION.LIKED
+      );
+    }
+
+    res
+      .status(StatusCodes.OK)
+      .json({ message: "Profile request already in notifications" });
+    return;
+  } else if (checkRejectRecord) {
+    res
+      .status(StatusCodes.OK)
+      .json({ message: "Profile request already rejected" });
     return;
   }
 
@@ -250,19 +325,30 @@ const profileSuperLike = async (req, res) => {
   const data = await Like.create({
     user_id,
     profile_id,
-    status: true,
-    isSuper: true,
+    status,
+    action,
+    isSuper,
     available: check,
   });
 
   if (data) {
-    const notify = create(
-      user_id,
-      profile_id,
-      TYPE.SUPERLIKED,
-      SUBJECT.SUPERLIKED,
-      NOTIFICATION.SUPERLIKED
-    );
+    if (status && action && isSuper) {
+      const notify = create(
+        user_id,
+        profile_id,
+        TYPE.SUPERLIKED,
+        SUBJECT.SUPERLIKED,
+        NOTIFICATION.SUPERLIKED
+      );
+    } else if (status && action && !isSuper) {
+      const notify = create(
+        user_id,
+        profile_id,
+        TYPE.LIKED,
+        SUBJECT.LIKED,
+        NOTIFICATION.LIKED
+      );
+    }
   }
 
   res.status(StatusCodes.OK).json(data);
