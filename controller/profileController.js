@@ -72,9 +72,26 @@ const profiles = async (req, res) => {
     .where({
       $or: [{ user_id: user_id }, { profile_id: user_id }],
     })
-    .select({ profile_id: 1, user_id: 1 });
+    .exec((err, result) => {
+      if (err) {
+        throw Error(err);
+      }
+      const newArr = [];
 
-  res.status(StatusCodes.OK).json(data);
+      function aFilter(array, array2) {
+        array2.forEach((element) => {
+          array = array.filter(
+            (item) =>
+              JSON.stringify(item._id) !== JSON.stringify(element.profile_id) &&
+              JSON.stringify(item._id) !== JSON.stringify(element.user_id)
+          );
+        });
+        return array;
+      }
+
+      res.status(StatusCodes.OK).json(aFilter(data, result));
+    });
+
   // const likedProfiles = await Like.find().where({ user_id: user_id });
 };
 
