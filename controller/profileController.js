@@ -92,7 +92,6 @@ const profiles = async (req, res) => {
       res.status(StatusCodes.OK).json(aFilter(data, result));
     });
 
-  // const likedProfiles = await Like.find().where({ user_id: user_id });
 };
 
 /* profile view */
