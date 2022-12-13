@@ -17,8 +17,8 @@ const chats = async (req, res) => {
       $or: [{ user_id: user_id }, { profile_id: user_id }],
       accept: true,
     })
-    .populate({ path: "user_id", select: "name _id profile age" })
-    .populate({ path: "profile_id", select: "name _id profile age" });
+    .populate({ path: "user_id", select: "name _id profile gender" })
+    .populate({ path: "profile_id", select: "name _id profile gender" });
 
   const findLast = async (uid, pid) => {
     const lastMessage = await Chat.findOne()
@@ -72,6 +72,15 @@ const connect = async (req, res) => {
     .populate({ path: "r_id", select: "name profile age" })
     .sort("-_id");
 
+  await Chat.find()
+    .where({
+      $or: [
+        { s_id: s_id, r_id: r_id },
+        { s_id: r_id, r_id: s_id },
+      ],
+    })
+    .update({ $set: { read: true } });
+
   res.json({ messages });
 };
 
@@ -91,7 +100,7 @@ const post = async (req, res) => {
     r_id: profile_id,
     type,
     content,
-    read: true,
+    read: false,
   });
 
   const all = await Chat.find({
