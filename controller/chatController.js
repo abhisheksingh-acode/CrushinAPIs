@@ -84,8 +84,8 @@ const post = async (req, res) => {
     user_id,
     profile_id,
   })
-    .populate({ path: "user_id", select: "name profile age" })
-    .populate({ path: "profile_id", select: "name profile age" })
+    .populate({ path: "s_id", select: "name profile age" })
+    .populate({ path: "r_id", select: "name profile age" })
     .sort("-_id")
     .exec();
 
