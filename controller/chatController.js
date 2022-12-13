@@ -13,8 +13,16 @@ const chats = async (req, res) => {
   const user_id = req.params.user_id;
 
   const data = await Chat.find()
-    .where("profile_id", { $ne: user_id })
+    .where({
+      $or : [
+        {user_id: user_id},
+        {profile_id : user_id}
+      ]
+    })
     .distinct("profile_id");
+
+    res.json(data)
+    return 
 
   const chatList = await Chat.find()
   .where({
@@ -22,7 +30,6 @@ const chats = async (req, res) => {
       $in: [...data]
     }
   }).sort("-_id")
-  .limit(1)
     .populate({ path: "user_id", select: "name profile _id" })
     .populate({ path: "profile_id", select: "name profile _id" });
 
