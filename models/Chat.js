@@ -3,10 +3,6 @@ import mongoose from "mongoose";
 import User from "./User.js";
 
 const ChatSchema = new mongoose.Schema({
-  chat_id: {
-    type : String,
-    required:[true, "please provide a chat id"]
-  },
   s_id: {
     type : mongoose.Types.ObjectId,
     ref : 'User'
