@@ -37,6 +37,11 @@ const transactions = async (req, res) => {
   
   res.status(StatusCodes.OK).json(data);
 };
+const transactionsAdmin = async (req, res) => {
+  const data = await Gem.find().sort("-_id").populate({path:"user_id",select:"name _id"});
+  
+  res.status(StatusCodes.OK).json(data);
+};
 
 const detail = async (req, res) => {
   const id = req.params.id;
@@ -96,4 +101,4 @@ const debit = async (req, res) => {
   res.status(StatusCodes.OK).json(result);
 };
 
-export { credit, debit, available, history, transactions, detail };
+export { credit, debit, available, history, transactions, detail,transactionsAdmin };
