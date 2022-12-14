@@ -30,7 +30,8 @@ const account = async (req, res) => {
   const gems = await availableGems(user_id);
   const gemsHistory = await gems_history(user_id);
   const superlikes = await availableSuperLikes(user_id);
+  const gemsHistoryLimit = gemsHistory.splice(0,3);
 
-  res.status(StatusCodes.OK).json({ user, gems, superlikes, gemsHistory });
+  res.status(StatusCodes.OK).json({ user, gems, superlikes, gemsHistory, gemsHistoryLimit });
 };
 export { account };
