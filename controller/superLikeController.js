@@ -67,6 +67,11 @@ const transactions = async (req, res) => {
 
   res.status(StatusCodes.OK).json(data);
 };
+const transactionsAdmin = async (req, res) => {
+  const data = await SuperLike.find().sort("-_id").populate({path: "user_id", select : "name _id"});
+
+  res.status(StatusCodes.OK).json(data);
+};
 
 const history = async (req, res) => {
   const user_id = req.params.user_id;
@@ -80,4 +85,4 @@ const history = async (req, res) => {
   res.status(StatusCodes.OK).json(available);
 };
 
-export { purchase, transactions, history };
+export { purchase, transactions, history, transactionsAdmin };

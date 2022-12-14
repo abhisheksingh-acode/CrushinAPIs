@@ -5,15 +5,14 @@ const router = express.Router();
 
 import {
   transactions,
-  history
+  history,
+  transactionsAdmin
 } from "../../controller/superLikeController.js";
 
 // middlwares auth token
 import UserTokenAuth from "../../middleware/tokenAuthenticate.js";
 
-
-
-router.post("/superlikes/", UserTokenAuth, transactions);
+router.post("/superlikes/", UserTokenAuth, transactionsAdmin);
 router.post("/superlikes/:user_id", UserTokenAuth, history);
 
 
