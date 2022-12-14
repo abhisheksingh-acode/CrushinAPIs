@@ -10,10 +10,12 @@ import {
   reset,
   update,
   users,
-  account,
   destroy,
   logout,
 } from "../../controller/authController.js";
+
+
+import { account } from "../../controller/admin/userController.js";
 
 // middlwares auth token
 import UserTokenAuth from "../../middleware/tokenAuthenticate.js";
