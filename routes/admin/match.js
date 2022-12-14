@@ -10,7 +10,7 @@ import { StatusCodes } from "http-status-codes";
 
 router.post("/matches", UserTokenAuth,async (req, res) => {
 
-     const data = await Like.find().where('accept',true).sort('-_id').exec();
+     const data = await Like.find().where('accept',true).sort('-_id').populate({path:"user_id", select:"name _id"}).populate({path: "profile_id", select: "name _id"});
 
      res.status(StatusCodes.OK).json(data);
 })
