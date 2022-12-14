@@ -15,9 +15,11 @@ import { create, read } from "../helpers/createNotification.js";
 const profiles = async (req, res) => {
   const user_id = req.body.user_id;
 
+  const { min, max, date } = req.query;
+
   const user = await User.findOne({ _id: user_id });
 
-  const {
+  let {
     relation_find,
     relation_type,
     habit_drink,
@@ -30,6 +32,10 @@ const profiles = async (req, res) => {
 
   var profileGender = null;
 
+  if (date.length) {
+    relation_find = date;
+
+  }
   switch (relation_find) {
     case "Man":
       profileGender = ["Male"];
@@ -63,6 +69,9 @@ const profiles = async (req, res) => {
     .where({
       habit_smoke,
       habit_drink,
+      age: {
+        $gte: min,
+      },
     })
     .where("_id", { $ne: user_id });
 
@@ -333,6 +342,13 @@ const profileSuperLike = async (req, res) => {
 
   if (data) {
     if (status && action && isSuper) {
+      const updateWallet = await SuperLike.create({
+        user_id: user_id,
+        available: check,
+        transaction: 1,
+        type: false,
+      });
+
       const notify = create(
         user_id,
         profile_id,
@@ -351,7 +367,7 @@ const profileSuperLike = async (req, res) => {
     }
   }
 
-  res.status(StatusCodes.OK).json(data);
+  return res.status(StatusCodes.OK).json(data);
 };
 
 /* super dislike */

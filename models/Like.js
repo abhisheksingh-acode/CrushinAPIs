@@ -57,18 +57,10 @@ const LikeSchema = new mongoose.Schema({
 LikeSchema.pre("save", async function () {
   if (this.status && this.accept) {
     this.label = LABEL.ACCEPT;
-  } else if (this.status && !this.action && !this.accept) {
+  } else if (this.status && this.action && !this.accept) {
     this.label = LABEL.REJECT;
   } else {
     this.label = LABEL.PENDING;
-  }
-  if (this.SuperLike) {
-    const updateWallet = await SuperLike.create({
-      user_id: this.user_id,
-      available: this.available,
-      transaction: 1,
-      type: false,
-    });
   }
 });
 
