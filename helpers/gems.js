@@ -17,6 +17,7 @@ const gems_history = async (user_id) => {
     const data = await Gem.find()
     .where("user_id")
     .equals(user_id)
+    .limit(10)
     .sort("-_id")
 
   return data;
