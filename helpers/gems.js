@@ -22,6 +22,15 @@ const gems_history = async (user_id) => {
 
   return data;
 };
+const gems_history_limit = async (user_id) => {
+    const data = await Gem.find()
+    .where("user_id")
+    .equals(user_id)
+    .limit(3)
+    .sort("-_id")
+
+  return data;
+};
 
 export default index;
-export {gems_history};
+export {gems_history, gems_history_limit};

@@ -8,7 +8,7 @@ import fs from "fs";
 
 import Referral, { STATUS } from "../../models/Referral.js";
 
-import availableGems, {gems_history} from "../../helpers/gems.js";
+import availableGems, {gems_history, gems_history_limit} from "../../helpers/gems.js";
 import availableSuperLikes from "../../helpers/superLikes.js";
 
 // allow env
@@ -30,8 +30,7 @@ const account = async (req, res) => {
   const gems = await availableGems(user_id);
   const gemsHistory = await gems_history(user_id);
   const superlikes = await availableSuperLikes(user_id);
-  let gemsHistoryLimit = gemsHistory;
-  gemsHistoryLimit = gemsHistoryLimit.splice(0,3);
+  const gemsHistoryLimit = await gems_history_limit(user_id);
 
   res.status(StatusCodes.OK).json({ user, gems, superlikes, gemsHistory, gemsHistoryLimit });
 };
