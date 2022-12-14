@@ -34,7 +34,6 @@ const profiles = async (req, res) => {
 
   if (date.length) {
     relation_find = date;
-
   }
   switch (relation_find) {
     case "Man":
@@ -107,10 +106,28 @@ const profiles = async (req, res) => {
 const profilesView = async (req, res) => {
   try {
     const id = req.params.id;
-    const user_id = req.body.user_id;
+    const user_id = req.body.viewer_id;
     const data = await User.findOne({ _id: id });
 
-    res.status(StatusCodes.OK).json(data);
+    const liked = await Like.findOne().where({
+      $or: [
+        {
+          user_id: user_id,
+          profile_id: id,
+        },
+        {
+          profile_id: user_id,
+          user_id: id,
+        },
+      ],
+    });
+
+    // res.json(liked)
+    // return
+
+    const response = { ...data._doc, liked };
+
+    res.status(StatusCodes.OK).json(response);
   } catch (error) {
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
