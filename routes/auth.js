@@ -33,7 +33,7 @@ import UserTokenAuth from "../middleware/tokenAuthenticate.js";
 
 // const uploader = multer({ storage: storage });
 
-router.get("/users", users);
+router.get("/users",UserTokenAuth, users);
 
 router.post("/account/:user_id", UserTokenAuth, account);
 

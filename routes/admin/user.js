@@ -34,7 +34,7 @@ const storage = multer.diskStorage({
 
 const uploader = multer({ storage: storage });
 
-router.post("/users", users);
+router.post("/users",UserTokenAuth, users);
 
 router.post("/account/:user_id", UserTokenAuth, account);
 
