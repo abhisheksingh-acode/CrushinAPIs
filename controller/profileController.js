@@ -66,8 +66,6 @@ const profiles = async (req, res) => {
       $in: [...profileGender],
     })
     .where({
-      habit_smoke,
-      habit_drink,
       age: {
         $gte: min,
       },

@@ -1,6 +1,11 @@
 import cors from "cors";
 import express from "express";
 const app = express();
+import http from "http";
+import { Server } from "socket.io";
+const server = http.createServer(app);
+
+const SocketIo = new Server(server);
 
 /* process env allowed */
 import dotenv from "dotenv";
@@ -28,7 +33,9 @@ import adminMatchesRouter from "./routes/admin/match.js";
 import mongoose from "mongoose";
 
 app.use(cors());
-app.use(express.json({extended:true, parameterLimit:100000, limit: "500mb"}));
+app.use(
+  express.json({ extended: true, parameterLimit: 100000, limit: "500mb" })
+);
 app.use(express.static("public"));
 
 app.use("/media", express.static("media"));
@@ -55,6 +62,36 @@ app.use("/api/admin", adminGemRouter);
 app.use("/api/admin", adminSuperLikeRouter);
 app.use("/api/admin", adminMatchesRouter);
 
+/*
+********************************
+ @Events For Socket Connection  
+********************************
+*/
+
+import { chatsSocket } from "./controller/chatController.js";
+
+SocketIo.on("connection", (socket) => {
+  console.log("socket client connect");
+
+  socket.on("chatConnect", async (s_id) => {
+    console.log("sender id", s_id);
+
+    const data = await chatsSocket(s_id)
+
+    // console.log(data);
+
+     socket.emit("chatConnect", data)
+  })
+
+  socket.on("disconnect", () => console.log("socket client disconnect"));  
+});
+
+/*
+********************************
+ @End Events  
+********************************
+*/
+
 app.use(notFound);
 app.use(errorHandlerMiddleware);
 
@@ -68,7 +105,7 @@ const start = async () => {
     const port = process.env.PORT || 5000;
     const urlHost = process.env.APP_URL;
 
-    app.listen(port, () => console.log(`server is listening at ${urlHost}`));
+    server.listen(port, () => console.log(`server is listening at ${urlHost}`));
   } catch (error) {
     console.log(error);
   }

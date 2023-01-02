@@ -38,7 +38,7 @@ const chats = async (req, res) => {
       // let openChatID = `${el.user_id._id}${el.profile_id._id}`;
       const lastMessage = await findLast(el.user_id._id, el.profile_id._id);
 
-      console.log(lastMessage);
+      // console.log(lastMessage);
       return {
         ...el._doc,
         last: lastMessage,
@@ -52,6 +52,53 @@ const chats = async (req, res) => {
   );
 
   res.json(descresult);
+};
+
+const chatsSocket = async (user_id) => {
+  if (user_id == null) {
+    throw new IfRequired("cannot access user information");
+  }
+
+  const match = await Like.find()
+    .where({
+      $or: [{ user_id: user_id }, { profile_id: user_id }],
+      accept: true,
+    })
+    .populate({ path: "user_id", select: "name _id profile gender" })
+    .populate({ path: "profile_id", select: "name _id profile gender" });
+
+  const findLast = async (uid, pid) => {
+    const lastMessage = await Chat.findOne()
+      .where({
+        $or: [
+          { s_id: uid, r_id: pid },
+          { r_id: uid, s_id: pid },
+        ],
+      })
+      .sort("-_id")
+      .limit(1);
+    return lastMessage;
+  };
+
+  const newMatch = await Promise.all(
+    match.map(async (el, index) => {
+      // let openChatID = `${el.user_id._id}${el.profile_id._id}`;
+      const lastMessage = await findLast(el.user_id._id, el.profile_id._id);
+
+      // console.log(lastMessage);
+      return {
+        ...el._doc,
+        last: lastMessage,
+        sortid: lastMessage !== null ? lastMessage.date : el.profile_id.date,
+      };
+    })
+  );
+
+  let descresult = newMatch.sort(
+    (a, b) => Date.parse(new Date(b.sortid)) - Date.parse(new Date(a.sortid))
+  );
+
+  return descresult
 };
 
 const connect = async (req, res) => {
@@ -119,4 +166,4 @@ const destroy = async (req, res) => {
   res.json({ send: true });
 };
 
-export { chats, connect, post, destroy };
+export { chats, chatsSocket, connect, post, destroy };
